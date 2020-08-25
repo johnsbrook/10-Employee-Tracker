@@ -8,7 +8,11 @@ const connection = mysql.createConnection({
     database: 'employees'
 });
 
-connection.connect();
+connection.connect(function(err){
+    if(err) throw err;
+    console.log("connected as id " + connection.threadId);
+  //  connection.end();
+});
 
 connection.query = util.promisify(connection.query);
 module.exports = connection;
