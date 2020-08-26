@@ -169,11 +169,11 @@ async function loadMainPrompts() {
       return removeEmployee();
     case "UPDATE_EMPLOYEE_ROLE": 
       return updateEmployeeRole(); // update in the database
-    case "VIEW_DEPARTMENT":
+    case "VIEW_DEPARTMENTS":
       return viewDepartments(); // 
     case "ADD_DEPARTMENT":
       return addDepartment();
-    case "REMOVE_DEPARTMENT":
+    case "REMOVE_DEPARTMENTS":
       return removeDepartment();
     case "VIEW_ROLES":
       return viewRoles();
@@ -242,7 +242,7 @@ async function loadMainPrompts() {
       empVal = [res.firstname, res.lastname, res.role, res.manager];
       var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + res.firstname + "','" + res.lastname + "','" + res.role + "','" + res.manager + "')";
    
-      console.log('First Name, Last Name, Role ID, Manager ID, Position, Department');
+      console.log('First Name, Last Name, Role ID, Manager ID');
       console.log(' ');
       console.log(empVal);
       console.log('=====================================');
@@ -341,22 +341,104 @@ async function loadMainPrompts() {
         console.log(empfn + " " + empln + "\'s new role number will be " + empRole);
         
         console.log(' ');
-          console.log(' '); 
-          console.log('=====================================');
-          console.log(' ');
-          console.log(' ');
-          loadMainPrompts();
+        console.log(' '); 
+        console.log('=====================================');
+        console.log(' ');
+        console.log(' ');
+        loadMainPrompts();
       });
     });  
   });
 }
 
 function viewDepartments() {
-  connection.query("SELECT department.name FROM department ORDER BY name DESC;", function (err, result, fields) {
+
+  connection.query("SELECT * FROM department ORDER BY id ASC;", function (err, res) {
     if (err) throw err;
-    console.table(result);
+    console.log(' ');
+    console.log('These are all the departments in the Company.');
+    console.log(' ');
+    console.table(res);
+    console.log(' ');
+    console.log('=====================================');
+    console.log(' ');
+    console.log(' ');
     loadMainPrompts();
   })
 }
 
+function addDepartment(){
+  prompt([
+   {
+      type: 'input',
+      message: 'What is the name of the new department?',
+      name: 'depName'
+    }
+  ]).then(function(res){
+    var depName = res.depName;
+    var ndsql = "INSERT INTO department (name) VALUES ('" + depName + "')";
+    var depsql = "SELECT * FROM department ORDER BY id ASC;"
+    connection.query(ndsql, function (err, res) {
+      if (err) throw err;
+    })
+    connection.query(depsql, function (err, res) {
+      if (err) throw err;
+      console.log(' ');
+      console.table(res);
+      console.log(' ');
+      console.log('=====================================');
+      console.log(' ');
+      console.log(' ');
+      loadMainPrompts();
+    })
+  
+  })
+}
+
+function removeDepartment() {
+
+  console.log(' ');
+  console.log(' ');
+  
+    connection.query("SELECT * FROM department ORDER BY id ASC" , function (err, res, fields) {
+    if (err) throw err;
+    console.table(res);
+
+    prompt([
+      {
+        type: 'input',
+        name: 'depID',
+        message: 'Enter the ID number of the department above that you would like to delete.'
+      }
+    ]).then(function(res){
+
+      var depID = res.depID;
+      var deleteSQL = "DELETE FROM department WHERE id = '" + depID + "'";
+
+      connection.query(deleteSQL, function (err, res) {
+        if (err) throw err;
+        console.log(' ');
+        console.log("The department\'s records have been deleted successfully.");
+        console.log(' ');
+        console.log("The new department records are the following");
+        
+      });
+      connection.query("SELECT * FROM department ORDER BY id ASC" , function (err, res, fields) {
+        
+        if (err) throw err;
+        console.log(' ');
+        console.table(res);
+        console.log(' ');
+        console.log('=====================================');
+        console.log(' ');
+        console.log(' ');
+        loadMainPrompts();
+        });    
+      })
+    })
+  }
+
+
+
+  
 }
