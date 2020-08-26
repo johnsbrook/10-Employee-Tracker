@@ -428,7 +428,7 @@ async function loadMainPrompts() {
     ]).then(function (res) {
       var depName = res.depName;
       var ndsql = "INSERT INTO department (name) VALUES ('" + depName + "')";
-      var depsql = "SELECT * FROM department ORDER BY id ASC;"
+      var depsql = "SELECT * FROM department ORDER BY id ASC;";
       connection.query(ndsql, function (err, res) {
         if (err) throw err;
       })
@@ -525,21 +525,25 @@ async function loadMainPrompts() {
     ]).then(function (res) {
 
       var empsql = "INSERT INTO role (title, salary, department_id) VALUES ('" + res.roleTitle + "','" + res.roleSalary + "','" + res.roleDep + "');";
+      var rolesql = "SELECT * FROM role";
 
       console.log('Role ID, Title, Salary, Department ID');
-      console.log(' ');
-      console.log(empsql);
-      console.log('=====================================');
+    
       connection.query(empsql, function (err, result) {
         if (err) throw err;
-        console.log("THE ROLE ABOVE HAS BEEN ADDED TO THE DATABASE");
+       
+        
+      });
+      connection.query(rolesql, function(err, res) {
+        console.table(res);
         console.log(' ');
+        console.log("The new role has been created.");
         console.log(' ');
+        console.log('==============================');
         console.log(' ');
-
         loadMainPrompts();
       })
-
+      
     })
 
   }
