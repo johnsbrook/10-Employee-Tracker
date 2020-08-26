@@ -510,7 +510,7 @@ async function loadMainPrompts() {
       ]).then(function (res) {
 
         var roleID = res.roleID;
-        var deleteSQL = "DELETE FROM department WHERE id = '" + roleID + "'";
+        var deleteSQL = "DELETE FROM role WHERE id = '" + roleID + "'";
 
         connection.query(deleteSQL, function (err, res) {
           if (err) throw err;
@@ -521,7 +521,7 @@ async function loadMainPrompts() {
           console.log("The updated roles are the following");
 
         });
-        connection.query("SELECT * FROM roles ORDER BY id ASC", function (err, res, fields) {
+        connection.query("SELECT * FROM role ORDER BY id ASC", function (err, res, fields) {
 
           if (err) throw err;
           console.log(' ');
@@ -533,6 +533,12 @@ async function loadMainPrompts() {
           loadMainPrompts();
         });
       })
+    })
+  }
+
+  function quit() {
+    connection.query("EXIT", function (err, res, fields) {
+      if (err) throw err;
     })
   }
 
