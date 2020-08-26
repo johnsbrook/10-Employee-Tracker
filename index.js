@@ -4,14 +4,15 @@ const logo = require("asciiart-logo");
 const { inherits } = require("util");
 const { async } = require("rxjs");
 const connection = require("./db/connection.js");
-
 require("console.table");
 init();
+
 function init() {
   const logoText = logo({ name: "Employee Manager" }).render();
   console.log(logoText);
   loadMainPrompts();
 }
+
 
 async function loadMainPrompts() {
 
@@ -38,7 +39,7 @@ async function loadMainPrompts() {
   for(var i = 0; i < department.length; i++) {
     depName.push(department[i].name)
   }
-  console.log(depName);
+  // console.log(depName);
 
   const role = [
     {
@@ -82,7 +83,7 @@ async function loadMainPrompts() {
   const roleTitle = [];
   // const roleSalary = [];
   for (var r = 0; r < role.length; r++) {
-    console.log(role[r].title);
+    // console.log(role[r].title);
     // console.log(role[r].salary);
     roleTitle.push(role[r].title);
     // roleTitle.push(role[r].salary);
@@ -259,14 +260,6 @@ async function loadMainPrompts() {
    
   }
 
-  function viewDepartments() {
-    connection.query("SELECT department.name FROM department ORDER BY name DESC;", function (err, result, fields) {
-      if (err) throw err;
-      console.table(result);
-      loadMainPrompts();
-    })
-  }
-
   function removeEmployee() {
     console.log(' ');
     console.log(' ');
@@ -301,19 +294,69 @@ async function loadMainPrompts() {
           console.table(result);
           console.log(' ');
           console.log('=====================================');
+          console.log(' ');
+          console.log(' ');
           loadMainPrompts();
         });
-      
-      })
-
-
-      
+      }) 
     })
   }
 
+
+  function updateEmployeeRole() {
+
+    console.log(' ');
+    console.log(' ');
+    connection.query("SELECT * FROM employee", function (err, result, fields) {
+    if (err) throw err;
+    console.table(result);
+    console.log(" ");
+    console.log(" ");
+    prompt([
+      {
+        type: 'input',
+        message: 'What is the employee ID number whose role you would like to update?',
+        name: 'empID'
+      },
+      {
+        type: 'input',
+        message: 'What woud be the employee\'s new role ID?',
+        name: 'empRole'
+      }
+    ]).then(function(res) {
+      var empRole = res.empRole;
+      var empID = res.empID;
+      connection.query("UPDATE employee SET role_id='" + empRole + "' WHERE id=" + empID, function (err, result, fields) {
+          if (err) throw err;
+      });
+      connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID , function (err, result, fields) {
+        var resultArray = []
+        var empResult = result;
+            resultArray.push(empResult)
+            // console.log(resultArray);
+            // console.log(resultArray[0][0].first_name)
+        var empfn = resultArray[0][0].first_name;
+        var empln = resultArray[0][0].last_name;
+        console.log(' '); 
+        console.log(empfn + " " + empln + "\'s new role number will be " + empRole);
+        
+        console.log(' ');
+          console.log(' '); 
+          console.log('=====================================');
+          console.log(' ');
+          console.log(' ');
+          loadMainPrompts();
+      });
+    });  
+  });
 }
 
+function viewDepartments() {
+  connection.query("SELECT department.name FROM department ORDER BY name DESC;", function (err, result, fields) {
+    if (err) throw err;
+    console.table(result);
+    loadMainPrompts();
+  })
+}
 
-
-
-
+}
