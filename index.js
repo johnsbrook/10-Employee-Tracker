@@ -36,7 +36,7 @@ async function loadMainPrompts() {
   ];
 
   var depName = [];
-  for(var i = 0; i < department.length; i++) {
+  for (var i = 0; i < department.length; i++) {
     depName.push(department[i].name)
   }
   // console.log(depName);
@@ -130,7 +130,7 @@ async function loadMainPrompts() {
         },
         {
           name: "Add role",
-          value: "ADD_ROLE",
+          value: "ADD_ROLES",
         },
         {
           name: "Remove role",
@@ -167,7 +167,7 @@ async function loadMainPrompts() {
       return addEmployee(); // insert into database
     case "REMOVE_EMPLOYEE":
       return removeEmployee();
-    case "UPDATE_EMPLOYEE_ROLE": 
+    case "UPDATE_EMPLOYEE_ROLE":
       return updateEmployeeRole(); // update in the database
     case "VIEW_DEPARTMENTS":
       return viewDepartments(); // 
@@ -179,13 +179,13 @@ async function loadMainPrompts() {
       return viewRoles();
     case "ADD_ROLES":
       return addRole();
-    case "REMOVE_ROLES":
+    case "REMOVE_ROLE":
       return removeRole();
     default:
       return quit();
   }
 
-  
+
 
   function viewEmployees() {
     connection.query("SELECT * FROM employee", function (err, result, fields) {
@@ -215,56 +215,56 @@ async function loadMainPrompts() {
     prompt([
       {
         type: 'input',
-        name: 'firstname', 
+        name: 'firstname',
         message: 'What\'s the employee\'s first name?'
       },
       {
         type: 'input',
-        name: 'lastname', 
+        name: 'lastname',
         message: 'What\'s the employee\'s last name?'
       },
       {
         type: 'input',
-        name: 'role', 
+        name: 'role',
         message: 'What\'s the employee\'s role ID?'
       },
       {
         type: 'input',
-        name: 'manager', 
+        name: 'manager',
         message: 'What\'s the employee\'s manager\'s ID?'
       }
-    ]).then(function(res) {
-     
+    ]).then(function (res) {
+
       console.log('=====================================');
       console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
       console.log(' ');
-   
-      empVal = [res.firstname, res.lastname, res.role, res.manager];
+
+      var empVal = [res.firstname, res.lastname, res.role, res.manager];
       var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + res.firstname + "','" + res.lastname + "','" + res.role + "','" + res.manager + "')";
-   
+
       console.log('First Name, Last Name, Role ID, Manager ID');
       console.log(' ');
       console.log(empVal);
       console.log('=====================================');
       connection.query(empsql, function (err, result) {
-      if (err) throw err;
-      console.log("THE EMPLOYEE ABOVE HAS BEEN ADDED TO THE DATABASE");
-      console.log(' ');
-      console.log(' ');
-      console.log(' ');
+        if (err) throw err;
+        console.log("THE EMPLOYEE ABOVE HAS BEEN ADDED TO THE DATABASE");
+        console.log(' ');
+        console.log(' ');
+        console.log(' ');
 
-      loadMainPrompts();
+        loadMainPrompts();
       })
 
     })
-   
+
   }
 
   function removeEmployee() {
     console.log(' ');
     console.log(' ');
-    
-      connection.query("SELECT * FROM employee" , function (err, result, fields) {
+
+    connection.query("SELECT * FROM employee", function (err, result, fields) {
       if (err) throw err;
       console.table(result);
 
@@ -274,7 +274,7 @@ async function loadMainPrompts() {
           name: 'empID',
           message: 'Enter the ID number of the employee above that you would like to delete.'
         }
-      ]).then(function(res){
+      ]).then(function (res) {
 
         var empID = res.empID;
         var deleteSQL = "DELETE FROM employee WHERE id = '" + empID + "'";
@@ -285,10 +285,10 @@ async function loadMainPrompts() {
           console.log("The employee\'s records have been deleted successfully.");
           console.log(' ');
           console.log("The new employee records are the following");
-          
+
         });
-        connection.query("SELECT * FROM employee" , function (err, result, fields) {
-          
+        connection.query("SELECT * FROM employee", function (err, result, fields) {
+
           if (err) throw err;
           console.log(' ');
           console.table(result);
@@ -298,7 +298,7 @@ async function loadMainPrompts() {
           console.log(' ');
           loadMainPrompts();
         });
-      }) 
+      })
     })
   }
 
@@ -308,81 +308,55 @@ async function loadMainPrompts() {
     console.log(' ');
     console.log(' ');
     connection.query("SELECT * FROM employee", function (err, result, fields) {
-    if (err) throw err;
-    console.table(result);
-    console.log(" ");
-    console.log(" ");
-    prompt([
-      {
-        type: 'input',
-        message: 'What is the employee ID number whose role you would like to update?',
-        name: 'empID'
-      },
-      {
-        type: 'input',
-        message: 'What woud be the employee\'s new role ID?',
-        name: 'empRole'
-      }
-    ]).then(function(res) {
-      var empRole = res.empRole;
-      var empID = res.empID;
-      connection.query("UPDATE employee SET role_id='" + empRole + "' WHERE id=" + empID, function (err, result, fields) {
+      if (err) throw err;
+      console.table(result);
+      console.log(" ");
+      console.log(" ");
+      prompt([
+        {
+          type: 'input',
+          message: 'What is the employee ID number whose role you would like to update?',
+          name: 'empID'
+        },
+        {
+          type: 'input',
+          message: 'What woud be the employee\'s new role ID?',
+          name: 'empRole'
+        }
+      ]).then(function (res) {
+        var empRole = res.empRole;
+        var empID = res.empID;
+        connection.query("UPDATE employee SET role_id='" + empRole + "' WHERE id=" + empID, function (err, result, fields) {
           if (err) throw err;
+        });
+        connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
+          var resultArray = []
+          var empResult = result;
+          resultArray.push(empResult)
+          // console.log(resultArray);
+          // console.log(resultArray[0][0].first_name)
+          var empfn = resultArray[0][0].first_name;
+          var empln = resultArray[0][0].last_name;
+          console.log(' ');
+          console.log(empfn + " " + empln + "\'s new role number will be " + empRole);
+
+          console.log(' ');
+          console.log(' ');
+          console.log('=====================================');
+          console.log(' ');
+          console.log(' ');
+          loadMainPrompts();
+        });
       });
-      connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID , function (err, result, fields) {
-        var resultArray = []
-        var empResult = result;
-            resultArray.push(empResult)
-            // console.log(resultArray);
-            // console.log(resultArray[0][0].first_name)
-        var empfn = resultArray[0][0].first_name;
-        var empln = resultArray[0][0].last_name;
-        console.log(' '); 
-        console.log(empfn + " " + empln + "\'s new role number will be " + empRole);
-        
-        console.log(' ');
-        console.log(' '); 
-        console.log('=====================================');
-        console.log(' ');
-        console.log(' ');
-        loadMainPrompts();
-      });
-    });  
-  });
-}
+    });
+  }
 
-function viewDepartments() {
+  function viewDepartments() {
 
-  connection.query("SELECT * FROM department ORDER BY id ASC;", function (err, res) {
-    if (err) throw err;
-    console.log(' ');
-    console.log('These are all the departments in the Company.');
-    console.log(' ');
-    console.table(res);
-    console.log(' ');
-    console.log('=====================================');
-    console.log(' ');
-    console.log(' ');
-    loadMainPrompts();
-  })
-}
-
-function addDepartment(){
-  prompt([
-   {
-      type: 'input',
-      message: 'What is the name of the new department?',
-      name: 'depName'
-    }
-  ]).then(function(res){
-    var depName = res.depName;
-    var ndsql = "INSERT INTO department (name) VALUES ('" + depName + "')";
-    var depsql = "SELECT * FROM department ORDER BY id ASC;"
-    connection.query(ndsql, function (err, res) {
+    connection.query("SELECT * FROM department ORDER BY id ASC;", function (err, res) {
       if (err) throw err;
-    })
-    connection.query(depsql, function (err, res) {
-      if (err) throw err;
+      console.log(' ');
+      console.log('These are all the departments in the Company.');
       console.log(' ');
       console.table(res);
       console.log(' ');
@@ -391,40 +365,23 @@ function addDepartment(){
       console.log(' ');
       loadMainPrompts();
     })
-  
-  })
-}
+  }
 
-function removeDepartment() {
-
-  console.log(' ');
-  console.log(' ');
-  
-    connection.query("SELECT * FROM department ORDER BY id ASC" , function (err, res, fields) {
-    if (err) throw err;
-    console.table(res);
-
+  function addDepartment() {
     prompt([
       {
         type: 'input',
-        name: 'depID',
-        message: 'Enter the ID number of the department above that you would like to delete.'
+        message: 'What is the name of the new department?',
+        name: 'depName'
       }
-    ]).then(function(res){
-
-      var depID = res.depID;
-      var deleteSQL = "DELETE FROM department WHERE id = '" + depID + "'";
-
-      connection.query(deleteSQL, function (err, res) {
+    ]).then(function (res) {
+      var depName = res.depName;
+      var ndsql = "INSERT INTO department (name) VALUES ('" + depName + "')";
+      var depsql = "SELECT * FROM department ORDER BY id ASC;"
+      connection.query(ndsql, function (err, res) {
         if (err) throw err;
-        console.log(' ');
-        console.log("The department\'s records have been deleted successfully.");
-        console.log(' ');
-        console.log("The new department records are the following");
-        
-      });
-      connection.query("SELECT * FROM department ORDER BY id ASC" , function (err, res, fields) {
-        
+      })
+      connection.query(depsql, function (err, res) {
         if (err) throw err;
         console.log(' ');
         console.table(res);
@@ -433,67 +390,150 @@ function removeDepartment() {
         console.log(' ');
         console.log(' ');
         loadMainPrompts();
-        });    
+      })
+
+    })
+  }
+
+  function removeDepartment() {
+
+    console.log(' ');
+    console.log(' ');
+
+    connection.query("SELECT * FROM department ORDER BY id ASC", function (err, res, fields) {
+      if (err) throw err;
+      console.table(res);
+
+      prompt([
+        {
+          type: 'input',
+          name: 'depID',
+          message: 'Enter the ID number of the department above that you would like to delete.'
+        }
+      ]).then(function (res) {
+
+        var depID = res.depID;
+        var deleteSQL = "DELETE FROM department WHERE id = '" + depID + "'";
+
+        connection.query(deleteSQL, function (err, res) {
+          if (err) throw err;
+          console.log(' ');
+          console.log("The department\'s records have been deleted successfully.");
+          console.log(' ');
+          console.log("The new department records are the following");
+
+        });
+        connection.query("SELECT * FROM department ORDER BY id ASC", function (err, res, fields) {
+
+          if (err) throw err;
+          console.log(' ');
+          console.table(res);
+          console.log(' ');
+          console.log('=====================================');
+          console.log(' ');
+          console.log(' ');
+          loadMainPrompts();
+        });
       })
     })
   }
- 
-function viewRoles() {
-  console.log(' ');
-  console.log(' ');
-  connection.query("SELECT * FROM employees.role;" , function (err, res, fields) {
-    if (err) throw err;
-    console.table(res);
-    console.log(' ');
-    console.log('=====================================');
-    console.log(' ');
-    console.log(' ');
-  
-    loadMainPrompts();
-})
-}
 
-function addRole() {
-
-prompt([
-   {
-      type: 'input',
-      message: 'What is the title of the new role?',
-      name: 'roleName'
-    },
-    {
-      type: 'input',
-      message: 'What is the salary of the new role?',
-      name: 'roleSalary'
-    },
-    {
-      type: 'input',
-      message: 'What is the department ID of the new role?',
-      name: 'roleDepartment'
-    }
-  ]).then(function(res){
-    var roleName = res.roleName;
-    var roleSalary = res.roleSalary;
-    var roleDepartment = res.roleDepartment;
-    var ndsql = "INSERT INTO role (title, salary, department_id) VALUES ('" + roleName + ', ' + roleSalary + ', ' + roleDepartment + "')";
-    var depsql = "SELECT * FROM role ORDER BY id ASC;"
-    connection.query(ndsql, function (err, res) {
+  function viewRoles() {
+    console.log(' ');
+    console.log(' ');
+    connection.query("SELECT * FROM employees.role;", function (err, res, fields) {
       if (err) throw err;
-    })
-    connection.query(depsql, function (err, res) {
-      if (err) throw err;
-      console.log(' ');
       console.table(res);
       console.log(' ');
       console.log('=====================================');
       console.log(' ');
       console.log(' ');
+
       loadMainPrompts();
     })
-  
-  })
+  }
 
-}
+  function addRole() {
 
+    prompt([
+      {
+        type: 'input',
+        message: 'What is the title of the new role?',
+        name: 'roleTitle'
+      },
+      {
+        type: 'input',
+        message: 'What is the salary of the new role?',
+        name: 'roleSalary'
+      },
+      {
+        type: 'input',
+        message: 'What is the department ID of the new role?',
+        name: 'roleDep'
+      }
+    ]).then(function (res) {
+
+      var empsql = "INSERT INTO role (title, salary, department_id) VALUES ('" + res.roleTitle + "','" + res.roleSalary + "','" + res.roleDep + "');";
+
+      console.log('Role ID, Title, Salary, Department ID');
+      console.log(' ');
+      console.log(empsql);
+      console.log('=====================================');
+      connection.query(empsql, function (err, result) {
+        if (err) throw err;
+        console.log("THE ROLE ABOVE HAS BEEN ADDED TO THE DATABASE");
+        console.log(' ');
+        console.log(' ');
+        console.log(' ');
+
+        loadMainPrompts();
+      })
+
+    })
+
+  }
+
+  function removeRole() {
+    console.log(' ');
+    console.log(' ');
+
+    connection.query("SELECT * FROM role ORDER BY id ASC", function (err, res, fields) {
+      if (err) throw err;
+      console.table(res);
+
+      prompt([
+        {
+          type: 'input',
+          name: 'roleID',
+          message: 'Enter the ID number of the role above that you would like to delete.'
+        }
+      ]).then(function (res) {
+
+        var roleID = res.roleID;
+        var deleteSQL = "DELETE FROM department WHERE id = '" + roleID + "'";
+
+        connection.query(deleteSQL, function (err, res) {
+          if (err) throw err;
+          console.log(' ');
+          console.log(' ');
+          console.log("The role\'s above has been deleted successfully.");
+          console.log(' ');
+          console.log("The updated roles are the following");
+
+        });
+        connection.query("SELECT * FROM roles ORDER BY id ASC", function (err, res, fields) {
+
+          if (err) throw err;
+          console.log(' ');
+          console.table(res);
+          console.log(' ');
+          console.log('=====================================');
+          console.log(' ');
+          console.log(' ');
+          loadMainPrompts();
+        });
+      })
+    })
+  }
 
 }
