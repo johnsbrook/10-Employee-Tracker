@@ -169,6 +169,8 @@ async function loadMainPrompts() {
       return removeEmployee();
     case "UPDATE_EMPLOYEE_ROLE":
       return updateEmployeeRole(); // update in the database
+    case "UPDATE_EMPLOYEE_MANAGER":
+      return updateEmployeeManager();
     case "VIEW_DEPARTMENTS":
       return viewDepartments(); // 
     case "ADD_DEPARTMENT":
@@ -302,7 +304,6 @@ async function loadMainPrompts() {
     })
   }
 
-
   function updateEmployeeRole() {
 
     console.log(' ');
@@ -345,6 +346,56 @@ async function loadMainPrompts() {
           console.log('=====================================');
           console.log(' ');
           console.log(' ');
+          loadMainPrompts();
+        });
+      });
+    });
+  }
+
+  function updateEmployeeManager() {
+    console.log(' ');
+    console.log(' ');
+    connection.query("SELECT * FROM employee", function (err, result, fields) {
+      if (err) throw err;
+      console.table(result);
+      console.log(" ");
+      console.log(" ");
+      prompt([
+        {
+          type: 'input',
+          message: 'What is the employee ID number whose manager you would like to update?',
+          name: 'empID'
+        },
+        {
+          type: 'input',
+          message: 'What woud be the employee\'s new manager ID?',
+          name: 'empManager'
+        }
+      ]).then(function (res) {
+        var empManager = res.empManager;
+        var empID = res.empID;
+        connection.query("UPDATE employee SET manager_id='" + empManager + "' WHERE id=" + empID, function (err, result, fields) {
+          // if (err) throw err;
+        });
+        
+        connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
+          var resultArray = []
+          var empResult = result;
+          resultArray.push(empResult)
+          // console.log(resultArray);
+          // console.log(resultArray[0][0].first_name)
+          var empfn = resultArray[0][0].first_name;
+          var empln = resultArray[0][0].last_name;
+          console.log(' ');
+          console.log(empfn + " " + empln + "\'s new manager will be number " + empManager);
+
+          console.log(' ');
+          console.log(' ');
+          console.log('=====================================');
+          console.log(' ');
+          console.log(' ');
+          loadMainPrompts();
+
           loadMainPrompts();
         });
       });
@@ -537,9 +588,7 @@ async function loadMainPrompts() {
   }
 
   function quit() {
-    connection.query("EXIT", function (err, res, fields) {
-      if (err) throw err;
-    })
+    process.exit();
   }
 
 }
