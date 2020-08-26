@@ -438,7 +438,62 @@ function removeDepartment() {
     })
   }
  
+function viewRoles() {
+  console.log(' ');
+  console.log(' ');
+  connection.query("SELECT * FROM employees.role;" , function (err, res, fields) {
+    if (err) throw err;
+    console.table(res);
+    console.log(' ');
+    console.log('=====================================');
+    console.log(' ');
+    console.log(' ');
+  
+    loadMainPrompts();
+})
+}
 
+function addRole() {
+
+prompt([
+   {
+      type: 'input',
+      message: 'What is the title of the new role?',
+      name: 'roleName'
+    },
+    {
+      type: 'input',
+      message: 'What is the salary of the new role?',
+      name: 'roleSalary'
+    },
+    {
+      type: 'input',
+      message: 'What is the department ID of the new role?',
+      name: 'roleDepartment'
+    }
+  ]).then(function(res){
+    var roleName = res.roleName;
+    var roleSalary = res.roleSalary;
+    var roleDepartment = res.roleDepartment;
+    var ndsql = "INSERT INTO role (title, salary, department_id) VALUES ('" + roleName + ', ' + roleSalary + ', ' + roleDepartment + "')";
+    var depsql = "SELECT * FROM role ORDER BY id ASC;"
+    connection.query(ndsql, function (err, res) {
+      if (err) throw err;
+    })
+    connection.query(depsql, function (err, res) {
+      if (err) throw err;
+      console.log(' ');
+      console.table(res);
+      console.log(' ');
+      console.log('=====================================');
+      console.log(' ');
+      console.log(' ');
+      loadMainPrompts();
+    })
+  
+  })
+
+}
 
 
 }
