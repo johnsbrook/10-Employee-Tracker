@@ -236,12 +236,50 @@ async function loadMainPrompts() {
         
       prompt([
         {
-          type: 'list',
-          name: 'title',
-          message: 'What is the title of the employee?',
-          choices: titleArray
-        }
-      ])
+              type: 'input',
+              name: 'firstname',
+              message: 'What\'s the employee\'s first name?'
+            },
+            {
+              type: 'input',
+              name: 'lastname',
+              message: 'What\'s the employee\'s last name?'
+            },
+            {
+              type: 'list',
+              name: 'role',
+              message: 'What\'s the employee\'s new role?',
+              choices: titleArray
+            },
+            {
+              type: 'input',
+              name: 'manager',
+              message: 'What\'s the employee\'s manager\'s ID?'
+            }
+          ]).then(function (res) {
+      
+            console.log('=====================================');
+            console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
+            console.log(' ');
+      
+            var empVal = [res.firstname, res.lastname, res.role, res.manager];
+            var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + res.firstname + "','" + res.lastname + "','" + res.role + "','" + res.manager + "')";
+      
+            console.log('First Name, Last Name, Role ID, Manager ID');
+            console.log(' ');
+            console.log(empVal);
+            console.log('=====================================');
+            connection.query(empsql, function (err, result) {
+              if (err) throw err;
+              console.log("THE EMPLOYEE ABOVE HAS BEEN ADDED TO THE DATABASE");
+              console.log(' ');
+              console.log(' ');
+              console.log(' ');
+      
+              loadMainPrompts();
+            })
+      
+          })
 
 
 
