@@ -209,8 +209,9 @@ async function loadMainPrompts() {
     connection.query("SELECT employee.manager_id, employee.first_name, employee.last_name FROM employee WHERE manager_id IS NOT NULL ORDER BY manager_id ASC;", function (err, result, fields) {
       if (err) throw err;
       console.table(result);
-      // loadMainPrompts();
+      loadMainPrompts();
     })
+    
   }
 
   function addEmployee() {
@@ -486,30 +487,7 @@ async function loadMainPrompts() {
         rArray.push(rResult);
 
       }
-      // // console.log(rArray);
-      // rArray = new Set(rArray);
-      // const rArrayU = [...rArray];
-      // // console.log(rArrayU)
-
-      // connection.query("SELECT  FROM employees.employee", function(err,res){
-
-      // rArrayU = []
-      // console.log(res);
-
-      // for (r = 0; r < res.length; r++){
-       
-      //   console.log(res[r].manager_id);
-      //   rArrayU.push(res[r].manager_id);
-      // }
-      // console.log(rArrayU)
-      // rArrayU = rArrayU.filter(function(item) {
-      //   return item !== null;
-      // });
-      // console.log(rArrayU);
-      // rArrayU = new Set (rArrayU);
-      // rArrayU = [...rArrayU];
-      // console.log(rArrayU);
-
+      
       prompt([
         {
           type: 'list',
@@ -528,15 +506,6 @@ async function loadMainPrompts() {
         // console.log(res.empID.split(' '));
         var empSplit = res.empID.split(' ');
         var empID = empSplit[2];
-        // console.log(empID);
-
-        // connection.query("SELECT * FROM employees.employee", function (err, res) {
-        //   if (err) throw err;
-        //   // console.log(res);
-        //   // console.log(res[0].id);
-        //   var empRoleID = res[0].manager_id;
-        //   console.log(empRoleID);
-         
 
           connection.query("UPDATE employee SET manager_id='" + empRole + "' WHERE id=" + empID, function (err, result, fields) {
             if (err) throw err;
@@ -546,8 +515,7 @@ async function loadMainPrompts() {
           var resultArray = []
           var empResult = result;
           resultArray.push(empResult)
-          // console.log(resultArray);
-          // console.log(resultArray[0][0].first_name)
+      
           var empfn = resultArray[0][0].first_name;
           var empln = resultArray[0][0].last_name;
           console.log(' ');
