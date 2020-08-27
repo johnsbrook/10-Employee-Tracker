@@ -241,43 +241,43 @@ async function loadMainPrompts() {
         objTitleRoleArray;
 
       // for (var y = 0; y < titleArray.length; y++) {
-        
-        for (var i = 0; i < roleIDArray.length; i++) {
-          objTitleRoleArray = {[titleArray[i]]: roleIDArray[i]};
-          newarray.push(objTitleRoleArray)      
+
+      for (var i = 0; i < roleIDArray.length; i++) {
+        objTitleRoleArray = { [titleArray[i]]: roleIDArray[i] };
+        newarray.push(objTitleRoleArray)
       }
       // console.log(newarray[0]);
 
 
       prompt([
         {
-              type: 'input',
-              name: 'firstname',
-              message: 'What\'s the employee\'s first name?'
-            },
-            {
-              type: 'input',
-              name: 'lastname',
-              message: 'What\'s the employee\'s last name?'
-            },
-            {
-              type: 'list',
-              name: 'role',
-              message: 'What\'s the employee\'s new role?',
-              choices: titleArray
-            },
-            {
-              type: 'input',
-              name: 'manager',
-              message: 'What\'s the employee\'s manager\'s ID?'
-            }
-          ])
+          type: 'input',
+          name: 'firstname',
+          message: 'What\'s the employee\'s first name?'
+        },
+        {
+          type: 'input',
+          name: 'lastname',
+          message: 'What\'s the employee\'s last name?'
+        },
+        {
+          type: 'list',
+          name: 'role',
+          message: 'What\'s the employee\'s new role?',
+          choices: titleArray
+        },
+        {
+          type: 'input',
+          name: 'manager',
+          message: 'What\'s the employee\'s manager\'s ID?'
+        }
+      ])
         .then(function (res) {
 
           console.log('=====================================');
           console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
           console.log(' ');
-        
+
           var fnRole = res.firstname;
           var lnRole = res.lastname;
           var rlRole = res.role;
@@ -310,8 +310,8 @@ async function loadMainPrompts() {
             })
           })
         })
-      })
-    }
+    })
+  }
 
   function removeEmployee() {
     console.log(' ');
@@ -337,39 +337,39 @@ async function loadMainPrompts() {
           choices: eArray
         }
       ])
-      .then(function (res) {
+        .then(function (res) {
 
-        // console.log(res);
-        // console.log(res.empID.split(' '));
-        var empSplit = res.empID.split(' ');
-        // console.log(empSplit[2]);
-        var empSplitEmpID = empSplit[2];
-        // console.log(empSplitEmpID);
-        var empID = empSplitEmpID;
-        // console.log(empID);
-  
-        var deleteSQL = "DELETE FROM employee WHERE id = '" + empID + "'";
+          // console.log(res);
+          // console.log(res.empID.split(' '));
+          var empSplit = res.empID.split(' ');
+          // console.log(empSplit[2]);
+          var empSplitEmpID = empSplit[2];
+          // console.log(empSplitEmpID);
+          var empID = empSplitEmpID;
+          // console.log(empID);
 
-        connection.query(deleteSQL, function (err, result) {
-          if (err) throw err;
-          console.log(' ');
-          console.log("The employee\'s records have been deleted successfully.");
-          console.log(' ');
-          console.log("The new employee records are the following");
+          var deleteSQL = "DELETE FROM employee WHERE id = '" + empID + "'";
 
-        });
-        connection.query("SELECT * FROM employee", function (err, result, fields) {
+          connection.query(deleteSQL, function (err, result) {
+            if (err) throw err;
+            console.log(' ');
+            console.log("The employee\'s records have been deleted successfully.");
+            console.log(' ');
+            console.log("The new employee records are the following");
 
-          if (err) throw err;
-          console.log(' ');
-          console.table(result);
-          console.log(' ');
-          console.log('=====================================');
-          console.log(' ');
-          console.log(' ');
-          loadMainPrompts();
-        });
-      })
+          });
+          connection.query("SELECT * FROM employee", function (err, result, fields) {
+
+            if (err) throw err;
+            console.log(' ');
+            console.table(result);
+            console.log(' ');
+            console.log('=====================================');
+            console.log(' ');
+            console.log(' ');
+            loadMainPrompts();
+          });
+        })
     })
   }
 
@@ -382,43 +382,89 @@ async function loadMainPrompts() {
       console.table(result);
       console.log(" ");
       console.log(" ");
+
+      var eArray = [];
+      var rArray = [];
+      for (var e = 0; e < result.length; e++) {
+        // console.log("Employee: ID " + result[e].id + " - " + result[e].first_name + " " + result[e].last_name + " Title: " + result[e].title + ", " + result[e].name);
+        var eResult = "Employee: ID " + result[e].id + " - " + result[e].first_name + " " + result[e].last_name + " Title: " + result[e].title + ", " + result[e].name;
+        var rResult = result[e].title;
+        eArray.push(eResult);
+        rArray.push(rResult);
+
+      }
+      // // console.log(rArray);
+      // rArray = new Set(rArray);
+      // const rArrayU = [...rArray];
+      // // console.log(rArrayU)
+
+      connection.query("SELECT role.id, role.title FROM employees.role", function(err,res){
+
+      rArrayU = []
+      console.log(res);
+      for (r = 0; r < res.length; r++){
+        console.log(res[r].id);
+        console.log(res[r].title);
+        rArrayU.push(res[r].title);
+      }
+      console.log(rArrayU)
+
       prompt([
         {
-          type: 'input',
-          message: 'What is the employee ID number whose role you would like to update?',
-          name: 'empID'
+          type: 'list',
+          message: 'Which employee\'s role would you like to update?',
+          name: 'empID',
+          choices: eArray
         },
         {
-          type: 'input',
-          message: 'What woud be the employee\'s new role ID?',
-          name: 'empRole'
+          type: 'list',
+          message: 'What woud be the employee\'s new role?',
+          name: 'empRole',
+          choices: rArrayU
         }
       ]).then(function (res) {
         var empRole = res.empRole;
-        var empID = res.empID;
-        connection.query("UPDATE employee SET role_id='" + empRole + "' WHERE id=" + empID, function (err, result, fields) {
-          if (err) throw err;
-        });
-        connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
-          var resultArray = []
-          var empResult = result;
-          resultArray.push(empResult)
-          // console.log(resultArray);
-          // console.log(resultArray[0][0].first_name)
-          var empfn = resultArray[0][0].first_name;
-          var empln = resultArray[0][0].last_name;
-          console.log(' ');
-          console.log(empfn + " " + empln + "\'s new role number will be " + empRole);
+        // console.log(res.empID.split(' '));
+        var empSplit = res.empID.split(' ');
+        var empID = empSplit[2];
+        // console.log(empID);
 
-          console.log(' ');
-          console.log(' ');
-          console.log('=====================================');
-          console.log(' ');
-          console.log(' ');
-          loadMainPrompts();
+        connection.query("SELECT * FROM employees.role WHERE role.title='" + empRole + "'", function (err, res) {
+          if (err) throw err;
+          // console.log(res);
+          // console.log(res[0].id);
+          var empRoleID = res[0].id;
+          // console.log(empRoleID);
+         
+
+          connection.query("UPDATE employee SET role_id='" + empRoleID + "' WHERE id=" + empID, function (err, result, fields) {
+            if (err) throw err;
+          });
+
+
+
+          connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
+            var resultArray = []
+            var empResult = result;
+            resultArray.push(empResult)
+            // console.log(resultArray);
+            // console.log(resultArray[0][0].first_name)
+            var empfn = resultArray[0][0].first_name;
+            var empln = resultArray[0][0].last_name;
+            console.log(' ');
+            console.log(empfn + " " + empln + "\'s new role number will be " + empRole);
+
+            console.log(' ');
+            console.log(' ');
+            console.log('=====================================');
+            console.log(' ');
+            console.log(' ');
+            loadMainPrompts();
+          });
         });
       });
     });
+  })
   }
 
   function updateEmployeeManager() {
