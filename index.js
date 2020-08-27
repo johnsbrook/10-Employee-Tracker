@@ -187,10 +187,13 @@ async function loadMainPrompts() {
       return quit();
   }
 
-
+  // SELECT name, price, GROUP_CONCAT(photo, ',')
+  // FROM drinks, drinks_photos
+  // WHERE drinks.id = drinks_id 
+  // GROUP BY drinks_id
 
   function viewEmployees() {
-    connection.query("SELECT * FROM employee", function (err, result, fields) {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, role.title, department.name FROM department, employee, role WHERE employee.role_id = role.id AND role.department_id = department.id GROUP BY employee.id;", function (err, result, fields) {
       if (err) throw err;
       console.table(result);
       loadMainPrompts();
@@ -198,7 +201,7 @@ async function loadMainPrompts() {
   }
 
   function viewEmployeesByDepartment() {
-    connection.query("SELECT department.name, employee.first_name, employee.last_name FROM employee INNER JOIN department ON department.id = employee.role_id ORDER BY department.name ASC;", function (err, result, fields) {
+    connection.query("SELECT department.name, employee.first_name, employee.last_name, role.title FROM department, employee, role WHERE employee.role_id = role.id AND role.department_id = department.id GROUP BY employee.id ORDER BY department.name ASC;", function (err, result, fields) {
       if (err) throw err;
       console.table(result);
       loadMainPrompts();
