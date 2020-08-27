@@ -215,25 +215,40 @@ async function loadMainPrompts() {
 
   function addEmployee() {
 
-  
-    connection.query('SELECT * FROM role;', function(err, res) {
+
+    connection.query('SELECT * FROM role;', function (err, res) {
 
       if (err) throw err;
-      
+
       // Array for title options in database
       var titleArray = [];
-
-        // Loop through all the options available inside the database
-        for (t = 0; t < res.length; t++) {
-          var titleFor =  res[t].title;
-          // console.log(titleFor);
-          titleArray.push(titleFor);
-        }
+      var roleIDArray = [];
+      // Loop through all the options available inside the database
+      for (t = 0; t < res.length; t++) {
+        var titleFor = res[t].title;
+        // console.log(titleFor);
+        titleArray.push(titleFor);
+      }
 
       // console.log(titleArray);
+      for (i = 0; i < res.length; i++) {
+        var roleIDFor = res[i].id;
+        // console.log(titleFor);
+        roleIDArray.push(roleIDFor);
+      }
+
+      var newarray = [],
+        thing;
+
+      // for (var y = 0; y < titleArray.length; y++) {
         
-        
-        
+        for (var i = 0; i < roleIDArray.length; i++) {
+          thing = {[titleArray[i]]: roleIDArray[i]};
+          newarray.push(thing)      
+      }
+      // console.log(newarray[0]);
+
+
       prompt([
         {
               type: 'input',
@@ -256,15 +271,30 @@ async function loadMainPrompts() {
               name: 'manager',
               message: 'What\'s the employee\'s manager\'s ID?'
             }
-          ]).then(function (res) {
-      
-            console.log('=====================================');
-            console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
-            console.log(' ');
-      
-            var empVal = [res.firstname, res.lastname, res.role, res.manager];
-            var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + res.firstname + "','" + res.lastname + "','" + res.role + "','" + res.manager + "')";
-      
+          ])
+        .then(function (res) {
+
+          // console.log('=====================================');
+          // console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
+          // console.log(' ');
+        
+          var fnRole = res.firstname;
+          var lnRole = res.lastname;
+          var rlRole = res.role;
+          var mngrRole = res.manager;
+          // console.log(rlRole);
+
+          var queryRole = "SELECT role.id FROM employees.role WHERE role.title = '" + rlRole + "';";
+
+          connection.query(queryRole, function (err, res) {
+            if (err) throw err;
+            console.table(res);
+            var roleID = res[0].id;
+            console.log(roleID);
+
+            var empVal = [fnRole, lnRole, roleID, mngrRole];
+            var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + fnRole + "','" + lnRole + "','" + roleID + "','" + mngrRole + "');";
+
             console.log('First Name, Last Name, Role ID, Manager ID');
             console.log(' ');
             console.log(empVal);
@@ -275,17 +305,20 @@ async function loadMainPrompts() {
               console.log(' ');
               console.log(' ');
               console.log(' ');
-      
+
               loadMainPrompts();
             })
-      
           })
 
 
 
+        })
+
+
+
     })
-    
-  
+
+
     // prompt([
     //   {
     //     type: 'input',
@@ -449,7 +482,7 @@ async function loadMainPrompts() {
         connection.query("UPDATE employee SET manager_id='" + empManager + "' WHERE id=" + empID, function (err, result, fields) {
           // if (err) throw err;
         });
-        
+
         connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
           var resultArray = []
           var empResult = result;
@@ -600,13 +633,13 @@ async function loadMainPrompts() {
       var rolesql = "SELECT * FROM role";
 
       console.log('Role ID, Title, Salary, Department ID');
-    
+
       connection.query(empsql, function (err, result) {
         if (err) throw err;
-       
-        
+
+
       });
-      connection.query(rolesql, function(err, res) {
+      connection.query(rolesql, function (err, res) {
         console.table(res);
         console.log(' ');
         console.log("The new role has been created.");
@@ -615,7 +648,7 @@ async function loadMainPrompts() {
         console.log(' ');
         loadMainPrompts();
       })
-      
+
     })
 
   }
