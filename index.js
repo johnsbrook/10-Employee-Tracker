@@ -16,78 +16,78 @@ function init() {
 
 async function loadMainPrompts() {
 
-  const department = [
-    {
-      id: 1,
-      name: "Sales",
-    },
-    {
-      id: 2,
-      name: "Engineering",
-    },
-    {
-      id: 3,
-      name: "HR",
-    },
-    {
-      id: 4,
-      name: "IT",
-    }
-  ];
+  // const department = [
+  //   {
+  //     id: 1,
+  //     name: "Sales",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Engineering",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "HR",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "IT",
+  //   }
+  // ];
 
-  var depName = [];
-  for (var i = 0; i < department.length; i++) {
-    depName.push(department[i].name)
-  }
-  // console.log(depName);
+  // var depName = [];
+  // for (var i = 0; i < department.length; i++) {
+  //   depName.push(department[i].name)
+  // }
+  // // console.log(depName);
 
-  const role = [
-    {
-      id: 1,
-      title: 'Sales Person',
-      salary: 100000,
-      department_id: 1,
-    },
-    {
-      id: 2,
-      title: 'Mechanical Engineer',
-      salary: 120000,
-      department_id: 2,
-    },
-    {
-      id: 3,
-      title: 'Software Engineer',
-      salary: 150000,
-      department_id: 2,
-    },
-    {
-      id: 4,
-      title: 'Junior Engineer',
-      salary: 85000,
-      department_id: 2,
-    },
-    {
-      id: 5,
-      title: 'HR Drone',
-      salary: 80000,
-      department_id: 3,
-    },
-    {
-      id: 6,
-      title: 'IT HERO',
-      salary: 70000,
-      department_id: 4,
-    },
-  ]
+  // const role = [
+  //   {
+  //     id: 1,
+  //     title: 'Sales Person',
+  //     salary: 100000,
+  //     department_id: 1,
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Mechanical Engineer',
+  //     salary: 120000,
+  //     department_id: 2,
+  //   },
+  //   {
+  //     id: 3,
+  //     title: 'Software Engineer',
+  //     salary: 150000,
+  //     department_id: 2,
+  //   },
+  //   {
+  //     id: 4,
+  //     title: 'Junior Engineer',
+  //     salary: 85000,
+  //     department_id: 2,
+  //   },
+  //   {
+  //     id: 5,
+  //     title: 'HR Drone',
+  //     salary: 80000,
+  //     department_id: 3,
+  //   },
+  //   {
+  //     id: 6,
+  //     title: 'IT HERO',
+  //     salary: 70000,
+  //     department_id: 4,
+  //   },
+  // ]
 
-  const roleTitle = [];
-  // const roleSalary = [];
-  for (var r = 0; r < role.length; r++) {
-    // console.log(role[r].title);
-    // console.log(role[r].salary);
-    roleTitle.push(role[r].title);
-    // roleTitle.push(role[r].salary);
-  }
+  // const roleTitle = [];
+  // // const roleSalary = [];
+  // for (var r = 0; r < role.length; r++) {
+  //   // console.log(role[r].title);
+  //   // console.log(role[r].salary);
+  //   roleTitle.push(role[r].title);
+  //   // roleTitle.push(role[r].salary);
+  // }
 
   const { choice } = await prompt([
     {
@@ -214,51 +214,85 @@ async function loadMainPrompts() {
   }
 
   function addEmployee() {
-    prompt([
-      {
-        type: 'input',
-        name: 'firstname',
-        message: 'What\'s the employee\'s first name?'
-      },
-      {
-        type: 'input',
-        name: 'lastname',
-        message: 'What\'s the employee\'s last name?'
-      },
-      {
-        type: 'input',
-        name: 'role',
-        message: 'What\'s the employee\'s role ID?'
-      },
-      {
-        type: 'input',
-        name: 'manager',
-        message: 'What\'s the employee\'s manager\'s ID?'
-      }
-    ]).then(function (res) {
 
-      console.log('=====================================');
-      console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
-      console.log(' ');
+  
+    connection.query('SELECT * FROM role;', function(err, res) {
 
-      var empVal = [res.firstname, res.lastname, res.role, res.manager];
-      var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + res.firstname + "','" + res.lastname + "','" + res.role + "','" + res.manager + "')";
+      if (err) throw err;
+      
+      // Array for title options in database
+      var titleArray = [];
 
-      console.log('First Name, Last Name, Role ID, Manager ID');
-      console.log(' ');
-      console.log(empVal);
-      console.log('=====================================');
-      connection.query(empsql, function (err, result) {
-        if (err) throw err;
-        console.log("THE EMPLOYEE ABOVE HAS BEEN ADDED TO THE DATABASE");
-        console.log(' ');
-        console.log(' ');
-        console.log(' ');
+        // Loop through all the options available inside the database
+        for (t = 0; t < res.length; t++) {
+          var titleFor =  res[t].title;
+          // console.log(titleFor);
+          titleArray.push(titleFor);
+        }
 
-        loadMainPrompts();
-      })
+      // console.log(titleArray);
+        
+        
+        
+      prompt([
+        {
+          type: 'list',
+          name: 'title',
+          message: 'What is the title of the employee?',
+          choices: titleArray
+        }
+      ])
+
+
 
     })
+    
+  
+    // prompt([
+    //   {
+    //     type: 'input',
+    //     name: 'firstname',
+    //     message: 'What\'s the employee\'s first name?'
+    //   },
+    //   {
+    //     type: 'input',
+    //     name: 'lastname',
+    //     message: 'What\'s the employee\'s last name?'
+    //   },
+    //   {
+    //     type: 'input',
+    //     name: 'role',
+    //     message: 'What\'s the employee\'s role ID?'
+    //   },
+    //   {
+    //     type: 'input',
+    //     name: 'manager',
+    //     message: 'What\'s the employee\'s manager\'s ID?'
+    //   }
+    // ]).then(function (res) {
+
+    //   console.log('=====================================');
+    //   console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
+    //   console.log(' ');
+
+    //   var empVal = [res.firstname, res.lastname, res.role, res.manager];
+    //   var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + res.firstname + "','" + res.lastname + "','" + res.role + "','" + res.manager + "')";
+
+    //   console.log('First Name, Last Name, Role ID, Manager ID');
+    //   console.log(' ');
+    //   console.log(empVal);
+    //   console.log('=====================================');
+    //   connection.query(empsql, function (err, result) {
+    //     if (err) throw err;
+    //     console.log("THE EMPLOYEE ABOVE HAS BEEN ADDED TO THE DATABASE");
+    //     console.log(' ');
+    //     console.log(' ');
+    //     console.log(' ');
+
+    //     loadMainPrompts();
+    //   })
+
+    // })
 
   }
 
