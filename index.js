@@ -1,7 +1,7 @@
 const { prompt } = require("inquirer");
 const logo = require("asciiart-logo");
 
-const { inherits } = require("util");
+const { inherits, isNullOrUndefined } = require("util");
 const { async } = require("rxjs");
 const connection = require("./db/connection.js");
 require("console.table");
@@ -189,7 +189,7 @@ async function loadMainPrompts() {
 
 
   function viewEmployees() {
-    connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, role.title, department.name FROM department, employee, role WHERE employee.role_id = role.id AND role.department_id = department.id GROUP BY employee.id;", function (err, result, fields) {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id, role.title, department.name FROM department, employee, role WHERE employee.role_id = role.id AND role.department_id = department.id GROUP BY employee.id;", function (err, result, fields) {
       if (err) throw err;
       console.table(result);
       loadMainPrompts();
@@ -470,49 +470,97 @@ async function loadMainPrompts() {
   function updateEmployeeManager() {
     console.log(' ');
     console.log(' ');
-    connection.query("SELECT * FROM employee", function (err, result, fields) {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id, role.title, department.name FROM employees.employee, employees.role, employees.department WHERE employee.role_id = role.id AND role.department_id = department.id;", function (err, result, fields) {
       if (err) throw err;
       console.table(result);
       console.log(" ");
       console.log(" ");
+
+      var eArray = [];
+      var rArray = [];
+      for (var e = 0; e < result.length; e++) {
+        // console.log("Employee: ID " + result[e].id + " - " + result[e].first_name + " " + result[e].last_name + " Title: " + result[e].title + ", " + result[e].name);
+        var eResult = "Employee: ID " + result[e].id + " - " + result[e].first_name + " " + result[e].last_name + " Title: " + result[e].title + ", " + result[e].name;
+        var rResult = result[e].title;
+        eArray.push(eResult);
+        rArray.push(rResult);
+
+      }
+      // // console.log(rArray);
+      // rArray = new Set(rArray);
+      // const rArrayU = [...rArray];
+      // // console.log(rArrayU)
+
+      // connection.query("SELECT  FROM employees.employee", function(err,res){
+
+      // rArrayU = []
+      // console.log(res);
+
+      // for (r = 0; r < res.length; r++){
+       
+      //   console.log(res[r].manager_id);
+      //   rArrayU.push(res[r].manager_id);
+      // }
+      // console.log(rArrayU)
+      // rArrayU = rArrayU.filter(function(item) {
+      //   return item !== null;
+      // });
+      // console.log(rArrayU);
+      // rArrayU = new Set (rArrayU);
+      // rArrayU = [...rArrayU];
+      // console.log(rArrayU);
+
       prompt([
         {
-          type: 'input',
-          message: 'What is the employee ID number whose manager you would like to update?',
-          name: 'empID'
+          type: 'list',
+          message: 'Which employee\'s manager would you like to update?',
+          name: 'empID',
+          choices: eArray
         },
         {
           type: 'input',
-          message: 'What woud be the employee\'s new manager ID?',
-          name: 'empManager'
+          message: 'What woud be the employee\'s new manager\'s ID?',
+          name: 'empRole',
         }
-      ]).then(function (res) {
-        var empManager = res.empManager;
-        var empID = res.empID;
-        connection.query("UPDATE employee SET manager_id='" + empManager + "' WHERE id=" + empID, function (err, result, fields) {
-          // if (err) throw err;
-        });
+      ])
+      .then(function (res) {
+        var empRole = res.empRole;
+        // console.log(res.empID.split(' '));
+        var empSplit = res.empID.split(' ');
+        var empID = empSplit[2];
+        // console.log(empID);
 
-        connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
-          var resultArray = []
-          var empResult = result;
-          resultArray.push(empResult)
-          // console.log(resultArray);
-          // console.log(resultArray[0][0].first_name)
-          var empfn = resultArray[0][0].first_name;
-          var empln = resultArray[0][0].last_name;
-          console.log(' ');
-          console.log(empfn + " " + empln + "\'s new manager will be number " + empManager);
+        // connection.query("SELECT * FROM employees.employee", function (err, res) {
+        //   if (err) throw err;
+        //   // console.log(res);
+        //   // console.log(res[0].id);
+        //   var empRoleID = res[0].manager_id;
+        //   console.log(empRoleID);
+         
 
-          console.log(' ');
-          console.log(' ');
-          console.log('=====================================');
-          console.log(' ');
-          console.log(' ');
-          loadMainPrompts();
+          connection.query("UPDATE employee SET manager_id='" + empRole + "' WHERE id=" + empID, function (err, result, fields) {
+            if (err) throw err;
+          });
 
-          loadMainPrompts();
-        });
+        // connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
+        //   var resultArray = []
+        //   var empResult = result;
+        //   resultArray.push(empResult)
+        //   // console.log(resultArray);
+        //   // console.log(resultArray[0][0].first_name)
+        //   var empfn = resultArray[0][0].first_name;
+        //   var empln = resultArray[0][0].last_name;
+        //   console.log(' ');
+        //   console.log(empfn + " " + empln + "\'s new manager will be number " + empManager);
+
+        //   console.log(' ');
+        //   console.log(' ');
+        //   console.log('=====================================');
+        //   console.log(' ');
+        //   console.log(' ');
+        //   loadMainPrompts();
+
+        // });
       });
     });
   }
