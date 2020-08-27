@@ -238,13 +238,13 @@ async function loadMainPrompts() {
       }
 
       var newarray = [],
-        thing;
+        objTitleRoleArray;
 
       // for (var y = 0; y < titleArray.length; y++) {
         
         for (var i = 0; i < roleIDArray.length; i++) {
-          thing = {[titleArray[i]]: roleIDArray[i]};
-          newarray.push(thing)      
+          objTitleRoleArray = {[titleArray[i]]: roleIDArray[i]};
+          newarray.push(objTitleRoleArray)      
       }
       // console.log(newarray[0]);
 
@@ -274,9 +274,9 @@ async function loadMainPrompts() {
           ])
         .then(function (res) {
 
-          // console.log('=====================================');
-          // console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
-          // console.log(' ');
+          console.log('=====================================');
+          console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
+          console.log(' ');
         
           var fnRole = res.firstname;
           var lnRole = res.lastname;
@@ -309,81 +309,45 @@ async function loadMainPrompts() {
               loadMainPrompts();
             })
           })
-
-
-
         })
-
-
-
-    })
-
-
-    // prompt([
-    //   {
-    //     type: 'input',
-    //     name: 'firstname',
-    //     message: 'What\'s the employee\'s first name?'
-    //   },
-    //   {
-    //     type: 'input',
-    //     name: 'lastname',
-    //     message: 'What\'s the employee\'s last name?'
-    //   },
-    //   {
-    //     type: 'input',
-    //     name: 'role',
-    //     message: 'What\'s the employee\'s role ID?'
-    //   },
-    //   {
-    //     type: 'input',
-    //     name: 'manager',
-    //     message: 'What\'s the employee\'s manager\'s ID?'
-    //   }
-    // ]).then(function (res) {
-
-    //   console.log('=====================================');
-    //   console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
-    //   console.log(' ');
-
-    //   var empVal = [res.firstname, res.lastname, res.role, res.manager];
-    //   var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + res.firstname + "','" + res.lastname + "','" + res.role + "','" + res.manager + "')";
-
-    //   console.log('First Name, Last Name, Role ID, Manager ID');
-    //   console.log(' ');
-    //   console.log(empVal);
-    //   console.log('=====================================');
-    //   connection.query(empsql, function (err, result) {
-    //     if (err) throw err;
-    //     console.log("THE EMPLOYEE ABOVE HAS BEEN ADDED TO THE DATABASE");
-    //     console.log(' ');
-    //     console.log(' ');
-    //     console.log(' ');
-
-    //     loadMainPrompts();
-    //   })
-
-    // })
-
-  }
+      })
+    }
 
   function removeEmployee() {
     console.log(' ');
     console.log(' ');
 
-    connection.query("SELECT * FROM employee", function (err, result, fields) {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id, role.title, department.name FROM employees.employee, employees.role, employees.department WHERE employee.role_id = role.id AND role.department_id = department.id;", function (err, result, fields) {
       if (err) throw err;
-      console.table(result);
+      // console.log(result);
+
+      var eArray = [];
+      for (var e = 0; e < result.length; e++) {
+        // console.log("Employee: ID " + result[e].id + " - " + result[e].first_name + " " + result[e].last_name + " Title: " + result[e].title + ", " + result[e].name);
+        var eResult = "Employee: ID " + result[e].id + " - " + result[e].first_name + " " + result[e].last_name + " Title: " + result[e].title + ", " + result[e].name;
+        eArray.push(eResult);
+      }
+      // console.log(eArray);
 
       prompt([
         {
-          type: 'input',
+          type: 'list',
           name: 'empID',
-          message: 'Enter the ID number of the employee above that you would like to delete.'
+          message: 'Select the employee to be deleted.',
+          choices: eArray
         }
-      ]).then(function (res) {
+      ])
+      .then(function (res) {
 
-        var empID = res.empID;
+        // console.log(res);
+        // console.log(res.empID.split(' '));
+        var empSplit = res.empID.split(' ');
+        // console.log(empSplit[2]);
+        var empSplitEmpID = empSplit[2];
+        // console.log(empSplitEmpID);
+        var empID = empSplitEmpID;
+        // console.log(empID);
+  
         var deleteSQL = "DELETE FROM employee WHERE id = '" + empID + "'";
 
         connection.query(deleteSQL, function (err, result) {
@@ -413,7 +377,7 @@ async function loadMainPrompts() {
 
     console.log(' ');
     console.log(' ');
-    connection.query("SELECT * FROM employee", function (err, result, fields) {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id, role.title, department.name FROM employees.employee, employees.role, employees.department WHERE employee.role_id = role.id AND role.department_id = department.id;", function (err, result, fields) {
       if (err) throw err;
       console.table(result);
       console.log(" ");
