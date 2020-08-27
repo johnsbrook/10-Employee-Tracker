@@ -542,25 +542,25 @@ async function loadMainPrompts() {
             if (err) throw err;
           });
 
-        // connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
-        //   var resultArray = []
-        //   var empResult = result;
-        //   resultArray.push(empResult)
-        //   // console.log(resultArray);
-        //   // console.log(resultArray[0][0].first_name)
-        //   var empfn = resultArray[0][0].first_name;
-        //   var empln = resultArray[0][0].last_name;
-        //   console.log(' ');
-        //   console.log(empfn + " " + empln + "\'s new manager will be number " + empManager);
+        connection.query("SELECT employee.first_name, employee.last_name FROM employee WHERE id=" + empID, function (err, result, fields) {
+          var resultArray = []
+          var empResult = result;
+          resultArray.push(empResult)
+          // console.log(resultArray);
+          // console.log(resultArray[0][0].first_name)
+          var empfn = resultArray[0][0].first_name;
+          var empln = resultArray[0][0].last_name;
+          console.log(' ');
+          console.log(empfn + " " + empln + "\'s new manager will be number " + empRole);
 
-        //   console.log(' ');
-        //   console.log(' ');
-        //   console.log('=====================================');
-        //   console.log(' ');
-        //   console.log(' ');
-        //   loadMainPrompts();
+          console.log(' ');
+          console.log(' ');
+          console.log('=====================================');
+          console.log(' ');
+          console.log(' ');
+          loadMainPrompts();
 
-        // });
+        });
       });
     });
   }
