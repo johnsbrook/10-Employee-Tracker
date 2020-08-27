@@ -577,6 +577,7 @@ async function loadMainPrompts() {
     })
   }
 
+  // Change to selectors
   function removeDepartment() {
 
     console.log(' ');
