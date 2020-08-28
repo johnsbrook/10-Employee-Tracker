@@ -275,9 +275,6 @@ async function loadMainPrompts() {
       ])
         .then(function (res) {
 
-          console.log('=====================================');
-          console.log('EMPLOYEE INFORMATION HAS BEEN RECEIVED');
-          console.log(' ');
 
           var fnRole = res.firstname;
           var lnRole = res.lastname;
@@ -289,26 +286,21 @@ async function loadMainPrompts() {
 
           connection.query(queryRole, function (err, res) {
             if (err) throw err;
-            console.table(res);
+            // console.table(res);
             var roleID = res[0].id;
-            console.log(roleID);
+            // console.log(roleID);
 
-            var empVal = [fnRole, lnRole, roleID, mngrRole];
+            var empVal = fnRole + ' ' + lnRole + ' ';
             var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + fnRole + "','" + lnRole + "','" + roleID + "','" + mngrRole + "');";
 
-            console.log('First Name, Last Name, Role ID, Manager ID');
             console.log(' ');
-            console.log(empVal);
+            console.log(empVal + 'has been added to Employee records.');
+            console.log(' ');
             console.log('=====================================');
-            connection.query(empsql, function (err, result) {
-              if (err) throw err;
-              console.log("THE EMPLOYEE ABOVE HAS BEEN ADDED TO THE DATABASE");
-              console.log(' ');
-              console.log(' ');
-              console.log(' ');
-
-              loadMainPrompts();
-            })
+            console.log(' ');
+            console.log(' ');
+            loadMainPrompts();
+            
           })
         })
     })
@@ -377,12 +369,11 @@ async function loadMainPrompts() {
   function updateEmployeeRole() {
 
     console.log(' ');
-    console.log(' ');
+    
     connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id, role.title, department.name FROM employees.employee, employees.role, employees.department WHERE employee.role_id = role.id AND role.department_id = department.id;", function (err, result, fields) {
       if (err) throw err;
-      console.table(result);
-      console.log(" ");
-      console.log(" ");
+      // console.table(result);
+     
 
       var eArray = [];
       var rArray = [];
@@ -402,14 +393,14 @@ async function loadMainPrompts() {
       connection.query("SELECT role.id, role.title FROM employees.role", function(err,res){
 
       rArrayU = []
-      console.log(res);
+      // console.log(res);
       for (r = 0; r < res.length; r++){
-        console.log(res[r].id);
-        console.log(res[r].title);
+        // console.log(res[r].id);
+        // console.log(res[r].title);
         rArrayU.push(res[r].title);
       }
-      console.log(rArrayU)
-
+      // console.log(rArrayU)
+      
       prompt([
         {
           type: 'list',
@@ -585,18 +576,28 @@ async function loadMainPrompts() {
 
     connection.query("SELECT * FROM department ORDER BY id ASC", function (err, res, fields) {
       if (err) throw err;
-      console.table(res);
+      // console.table(res);
+      
+      resArray = [];
+      
+      for (r = 0; r < res.length; r++) {
+        var deps = res[r].name;
+        // console.log(deps);
+        resArray.push(deps);
+      }
+      // console.log(resArray)
 
       prompt([
         {
-          type: 'input',
+          type: 'list',
           name: 'depID',
-          message: 'Enter the ID number of the department above that you would like to delete.'
+          message: 'Which department would you like to remove?',
+          choices: resArray
         }
       ]).then(function (res) {
 
         var depID = res.depID;
-        var deleteSQL = "DELETE FROM department WHERE id = '" + depID + "'";
+        var deleteSQL = "DELETE FROM department WHERE department.name='" + depID + "'";
 
         connection.query(deleteSQL, function (err, res) {
           if (err) throw err;
@@ -614,7 +615,7 @@ async function loadMainPrompts() {
           console.log(' ');
           console.log('=====================================');
           console.log(' ');
-          console.log(' ');
+        
           loadMainPrompts();
         });
       })
@@ -682,22 +683,29 @@ async function loadMainPrompts() {
 
   function removeRole() {
     console.log(' ');
-    console.log(' ');
-
+ 
     connection.query("SELECT * FROM role ORDER BY id ASC", function (err, res, fields) {
       if (err) throw err;
-      console.table(res);
+      // console.table(res);
 
+      var resArray = []
+      for (r = 0; r < res.length; r++) {
+        // console.log(res[r].title)
+        var titles = res[r].title;
+        resArray.push(titles);
+      }
+      // console.log(resArray);
       prompt([
         {
-          type: 'input',
+          type: 'list',
           name: 'roleID',
-          message: 'Enter the ID number of the role above that you would like to delete.'
+          message: 'Which role would you like to delete?',
+          choices: resArray
         }
       ]).then(function (res) {
 
         var roleID = res.roleID;
-        var deleteSQL = "DELETE FROM role WHERE id = '" + roleID + "'";
+        var deleteSQL = "DELETE FROM role WHERE role.title='" + roleID + "'";
 
         connection.query(deleteSQL, function (err, res) {
           if (err) throw err;
