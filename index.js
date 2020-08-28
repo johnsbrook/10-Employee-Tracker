@@ -4,6 +4,7 @@ const logo = require("asciiart-logo");
 const { inherits, isNullOrUndefined } = require("util");
 const { async } = require("rxjs");
 const connection = require("./db/connection.js");
+const { connect } = require("./db/connection.js");
 require("console.table");
 init();
 
@@ -292,14 +293,17 @@ async function loadMainPrompts() {
 
             var empVal = fnRole + ' ' + lnRole + ' ';
             var empsql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('" + fnRole + "','" + lnRole + "','" + roleID + "','" + mngrRole + "');";
-
-            console.log(' ');
-            console.log(empVal + 'has been added to Employee records.');
-            console.log(' ');
-            console.log('=====================================');
-            console.log(' ');
-            console.log(' ');
-            loadMainPrompts();
+            connection.query(empsql, function (err, res){
+              if (err) throw err;
+              console.log(' ');
+              console.log(empVal + 'has been added to Employee records.');
+              console.log(' ');
+              console.log('=====================================');
+              console.log(' ');
+              console.log(' ');
+              loadMainPrompts();
+            })
+            
             
           })
         })
