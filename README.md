@@ -4,7 +4,7 @@
 
 ## Description 
  
-Employee Tracker is a NodeJS application that allows the user to update employee, department and role information using CLI. 
+Employee Tracker is a Node.js application that allows the user to update employee, department and role information using CLI. 
 
 
 ## Table of Contents 
